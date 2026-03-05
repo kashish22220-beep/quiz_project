@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ quiz.title }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f0abfc, #c4b5fd); min-height: 100vh; padding: 30px 20px; }
+    .container { max-width: 700px; margin: 0 auto; }
+    .card { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 25px; }
+    h1 { color: #333; margin-bottom: 15px; font-size: 28px; }
+    .desc { color: #666; margin-bottom: 25px; line-height: 1.6; }
+    h3 { color: #333; margin-bottom: 15px; font-size: 20px; }
+    .question-list { list-style: none; }
+    .question-item { padding: 15px; margin-bottom: 12px; background: #f9f9f9; border-left: 4px solid #f0abfc; border-radius: 8px; color: #555; }
+    .btn { display: inline-block; padding: 13px 35px; background: linear-gradient(135deg, #f0abfc, #c4b5fd); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: 0.3s; margin-top: 20px; }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(240,171,252,0.35); }
+    .empty { text-align: center; color: #999; padding: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>{{ quiz.title }}</h1>
+      <p class="desc">{{ quiz.description|default:"No description available" }}</p>
+      
+      <h3>Questions Preview</h3>
+      <ul class="question-list">
+        {% for q in questions %}
+          <li class="question-item">{{ forloop.counter }}. {{ q.text }}</li>
+        {% empty %}
+          <li class="empty">No questions available yet.</li>
+        {% endfor %}
+      </ul>
+      
+      <center>
+        <a class="btn" href="{% url 'quiz:take_quiz' quiz.id %}">Start Quiz →</a>
+      </center>
+    </div>
+  </div>
+</body>
+</html>

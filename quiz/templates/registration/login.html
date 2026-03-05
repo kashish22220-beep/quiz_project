@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Quiz Platform</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #ffb8e6, #c6b4ff); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+    .card { background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 40px; width: 100%; max-width: 400px; }
+    h1 { color: #333; margin-bottom: 20px; }
+    label { display: block; margin: 15px 0 5px; color: #555; font-weight: 500; }
+    input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; transition: 0.3s; }
+    input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    button { width: 100%; padding: 12px; margin-top: 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.3); }
+    .links { margin-top: 15px; text-align: center; font-size: 13px; }
+    .links a { color: #667eea; text-decoration: none; margin: 0 5px; }
+    .error { color: #d32f2f; font-size: 12px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Welcome Back</h1>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      {% for field in form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="error">{{ field.errors|striptags }}</div>
+        {% endif %}
+      {% endfor %}
+
+      {#  "Please enter a correct username and password"#}
+      {% if form.non_field_errors %}
+        <div class="error">{{ form.non_field_errors|striptags }}</div>
+      {% endif %}
+
+      <button type="submit">Sign In</button>
+    </form>
+    <div class="links">
+      <a href="{% url 'quiz:register' %}">Sign up</a> | <a href="{% url 'password_reset' %}">Forgot password?</a>
+    </div>
+  </div>
+</body>
+</html>

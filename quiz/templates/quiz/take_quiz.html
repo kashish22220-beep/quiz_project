@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Take Quiz: {{ quiz.title }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f0abfc, #c4b5fd); min-height: 100vh; padding: 30px 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .header { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 30px; text-align: center; }
+    .header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
+    .header p { color: #666; font-size: 14px; }
+    .form-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+    .question-card { padding: 25px; margin-bottom: 20px; background: #f9f9f9; border-radius: 10px; border-left: 5px solid #f0abfc; }
+    .question-num { display: inline-block; background: linear-gradient(135deg, #f0abfc, #c4b5fd); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; margin-right: 10px; font-size: 14px; }
+    .question-text { color: #333; font-weight: 600; margin-bottom: 16px; font-size: 15px; }
+    .choice-group { margin-bottom: 20px; }
+    .choice-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .choice-item:hover { border-color: #f0abfc; background: #faf8ff; }
+    .choice-item input { margin-right: 12px; cursor: pointer; width: 18px; height: 18px; accent-color: #f0abfc; }
+    .choice-item label { margin: 0; cursor: pointer; color: #555; font-size: 14px; flex: 1; }
+    textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: Arial, sans-serif; font-size: 14px; resize: vertical; transition: 0.3s; }
+    textarea:focus { outline: none; border-color: #f0abfc; background: #faf8ff; }
+    .submit-btn { width: 100%; padding: 15px; margin-top: 30px; background: linear-gradient(135deg, #f0abfc, #c4b5fd); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.3s; }
+    .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(240,171,252,0.35); }
+    .submit-btn:active { transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{ quiz.title }}</h1>
+      <p>{{ questions.count }} question{{ questions.count|pluralize }}</p>
+    </div>
+
+    <div class="form-wrapper">
+      <form method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+          <div class="question-card">
+            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+              <span class="question-num">{{ forloop.counter }}</span>
+              <div class="question-text" style="margin-bottom: 0;">{{ question.text }}</div>
+            </div>
+
+            <div class="choice-group">
+              {% if question.question_type == 'single' %}
+                {% for choice in question.choices.all %}
+                  <div class="choice-item">
+                    <input type="radio" id="q{{ question.id }}_c{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}">
+                    <label for="q{{ question.id }}_c{{ choice.id }}">{{ choice.text }}</label>
+                  </div>
+                {% endfor %}
+              {% elif question.question_type == 'multi' %}
+                {% for choice in question.choices.all %}
+                  <div class="choice-item">
+                    <input type="checkbox" id="q{{ question.id }}_c{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}">
+                    <label for="q{{ question.id }}_c{{ choice.id }}">{{ choice.text }}</label>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <textarea name="question_{{ question.id }}" rows="4" placeholder="Enter your answer here..."></textarea>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="submit-btn">Submit Quiz</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

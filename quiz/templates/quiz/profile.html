@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f0abfc, #c4b5fd); min-height: 100vh; padding: 30px 20px; }
+    .container { max-width: 750px; margin: 0 auto; }
+    .profile-card { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 25px; }
+    .profile-header { text-align: center; margin-bottom: 25px; }
+    .username { color: #333; font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+    .email { color: #666; font-size: 14px; }
+    .section-title { color: #333; font-size: 20px; font-weight: 600; margin-bottom: 20px; margin-top: 25px; }
+    .attempts-list { list-style: none; }
+    .attempt-item { padding: 18px; margin-bottom: 15px; background: #f9f9f9; border-left: 5px solid #f0abfc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .attempt-info { flex: 1; }
+    .attempt-quiz { color: #333; font-weight: 600; margin-bottom: 6px; }
+    .attempt-score { color: #f0abfc; font-size: 16px; font-weight: bold; }
+    .attempt-link { padding: 8px 18px; background: linear-gradient(135deg, #f0abfc, #c4b5fd); color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; transition: 0.3s; }
+    .attempt-link:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(240,171,252,0.3); }
+    .empty { text-align: center; color: #999; padding: 30px; background: #f9f9f9; border-radius: 8px; }
+    .footer { display: flex; gap: 15px; justify-content: center; margin-top: 25px; }
+    .btn { padding: 11px 25px; background: linear-gradient(135deg, #f0abfc, #c4b5fd); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.3s; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(240,171,252,0.3); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="username">{{ profile_user.username }}</div>
+        <div class="email">{{ profile_user.email|default:"No email set" }}</div>
+      </div>
+
+      <h3 class="section-title">Your Quiz Attempts</h3>
+      <ul class="attempts-list">
+        {% for at in attempts %}
+          <li class="attempt-item">
+            <div class="attempt-info">
+              <div class="attempt-quiz">{{ at.quiz.title }}</div>
+              <div class="attempt-score">{{ at.score|floatformat:0 }}% • {{ at.correct }}/{{ at.total }}</div>
+            </div>
+            <a class="attempt-link" href="{% url 'quiz:result' at.id %}">View Details</a>
+          </li>
+        {% empty %}
+          <li class="empty">No quiz attempts yet. Start taking quizzes!</li>
+        {% endfor %}
+      </ul>
+
+      <div class="footer">
+        <a class="btn" href="{% url 'quiz:user_dashboard' %}">← Dashboard</a>
+        <a class="btn" href="{% url 'logout' %}">Logout</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

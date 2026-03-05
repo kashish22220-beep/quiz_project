@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Quizzes</title></head>
+<body>
+  <h1>Available Quizzes</h1>
+  <ul>
+    {% for quiz in quizzes %}
+      <li><a href="{% url 'quiz:quiz_detail' quiz.id %}">{{ quiz.title }}</a></li>
+    {% empty %}
+      <li>No quizzes yet.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

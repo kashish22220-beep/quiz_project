@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  {% load tz %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Result</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f0abfc, #c4b5fd); min-height: 100vh; padding: 30px 20px; }
+    .container { max-width: 750px; margin: 0 auto; }
+    .header { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 25px; text-align: center; }
+    .header h1 { color: #333; margin-bottom: 20px; font-size: 32px; }
+    .score-display { background: linear-gradient(135deg, #f0abfc, #c4b5fd); padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+    .score-big { font-size: 56px; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .score-label { color: rgba(255,255,255,0.95); font-size: 15px; margin-top: 8px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+    .stat-card { background: white; padding: 18px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .stat-num { font-size: 28px; font-weight: bold; color: #f0abfc; }
+    .stat-text { color: #666; font-size: 13px; margin-top: 6px; }
+    .info-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 25px; }
+    .info-card p { color: #555; margin: 10px 0; font-size: 14px; }
+    .info-card strong { color: #333; }
+    .answers { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+    .answers h2 { color: #333; margin-bottom: 20px; font-size: 22px; }
+    .answer-card { padding: 16px; margin-bottom: 15px; border-radius: 8px; border-left: 5px solid #ddd; background: #f9f9f9; }
+    .answer-card.correct { border-left-color: #4caf50; background: #f1f8f4; }
+    .answer-card.incorrect { border-left-color: #ff6b6b; background: #fff5f5; }
+    .q-text { color: #333; font-weight: 600; margin-bottom: 10px; font-size: 14px; }
+    .a-text { color: #666; font-size: 13px; margin: 6px 0; }
+    .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 8px; }
+    .badge.correct { background: #d4edda; color: #155724; }
+    .badge.incorrect { background: #f8d7da; color: #721c24; }
+    .back-btn { display: inline-block; margin-top: 30px; padding: 13px 40px; background: linear-gradient(135deg, #f0abfc, #c4b5fd); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: 0.3s; text-align: center; }
+    .back-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(240,171,252,0.35); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Quiz Complete!</h1>
+      <div class="score-display">
+        <div class="score-big">{{ attempt.score|floatformat:0 }}%</div>
+        <div class="score-label">Your Score</div>
+      </div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-num">{{ attempt.correct }}</div>
+          <div class="stat-text">Correct Answers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">{{ attempt.total }}</div>
+          <div class="stat-text">Total Questions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <p><strong>Quiz:</strong> {{ attempt.quiz.title }}</p>
+      <p><strong>User:</strong> {{ attempt.user }}</p>
+      <p><strong>Completed:</strong> {% if attempt.completed_at %}{{ attempt.completed_at|localtime|date:"d M Y, g:i A" }}{% else %}In Progress{% endif %}</p>
+    </div>
+
+    <div class="answers">
+      <h2>Answer Details</h2>
+      {% for ans in answers %}
+        <div class="answer-card {% if ans.is_correct %}correct{% else %}incorrect{% endif %}">
+          <div class="q-text">{{ forloop.counter }}. {{ ans.question.text }}</div>
+          <div class="a-text"><strong>Your Answer:</strong> {{ ans.selected_text|default:ans.selected_choice }}</div>
+          <span class="badge {% if ans.is_correct %}correct{% else %}incorrect{% endif %}">
+            {% if ans.is_correct %}✓ Correct{% else %}✗ Incorrect{% endif %}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <center>
+      <a class="back-btn" href="{% url 'quiz:user_dashboard' %}">← Back to Dashboard</a>
+    </center>
+  </div>
+</body>
+</html>

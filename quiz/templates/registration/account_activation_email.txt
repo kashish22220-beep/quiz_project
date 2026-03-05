@@ -1,0 +1,10 @@
+Hello {{ user.username }},
+
+Please click the link below to activate your account:
+
+http://{{ domain }}{% url 'quiz:activate' uidb64=uid token=token %}
+
+If the link does not work, copy and paste the full URL into your browser.
+
+Thank you,
+{{ domain }}

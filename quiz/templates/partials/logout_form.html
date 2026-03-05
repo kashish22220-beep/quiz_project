@@ -1,0 +1,7 @@
+{% if request.user.is_authenticated %}
+<form id="logoutForm" method="post" action="{% url 'logout' %}" style="display:inline;margin:0;padding:0;">
+  {% csrf_token %}
+  <!-- link-style sign out (looks like a link but sends POST) -->
+  <a href="#" onclick="document.getElementById('logoutForm').submit(); return false;">Sign out</a>
+</form>
+{% endif %}

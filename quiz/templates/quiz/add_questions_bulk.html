@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bulk Add Questions - {{ quiz.title }}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f7f9fc;padding:18px}
+    .container{max-width:1100px;margin:16px auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .qblock{border:1px dashed #ddd;padding:12px;margin-bottom:12px;border-radius:6px;background:#fafafa}
+    label{display:block;margin:6px 0;font-weight:600}
+    input[type="text"], textarea, select, input[type="number"]{width:100%;box-sizing:border-box;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px}
+    .choices{margin-top:8px}
+    .choice-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+    .choice-row input[type="text"]{flex:1}
+    .btn{display:inline-block;padding:8px 12px;border-radius:6px;background:#1e88e5;color:#fff;text-decoration:none;border:none;cursor:pointer}
+    .btn-danger{background:#e53935}
+    .muted{color:#666;margin-top:8px}
+    .top-actions{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Add Questions for "{{ quiz.title }}"</h1>
+    <p class="muted">Add multiple questions and their choices. After submit you'll return to Admin Dashboard.</p>
+
+    <div class="top-actions">
+      <button id="addQuestionBtn" class="btn">+ Add Question Block</button>
+      <button id="submitBtn" class="btn" style="background:#28a745">Submit All</button>
+      <a href="{% url 'quiz:admin_dashboard' %}" class="btn" style="background:#6c757d">Cancel</a>
+    </div>
+
+    <form id="bulkForm" method="post" action="">
+      {% csrf_token %}
+      <input type="hidden" name="payload" id="payloadField">
+      <div id="questionsContainer">
+        
+      </div>
+    </form>
+
+    <template id="questionTemplate">
+      <div class="qblock" data-qindex="{index}">
+        <label>Question {number}</label>
+        <textarea name="q_text_{index}" rows="2" required></textarea>
+
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <div style="flex:1">
+            <label>Question Type</label>
+            <select name="q_type_{index}">
+              <option value="multi">Multiple choice</option>
+            </select>
+          </div>
+          <div style="width:140px">
+            <label>Difficulty</label>
+            <select name="q_diff_{index}">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+          <div style="width:120px">
+            <label>Marks</label>
+            <input type="number" name="q_marks_{index}" min="1" value="1">
+          </div>
+        </div>
+
+        <div class="choices" id="choices_{index}">
+          <label>Choices (check correct)</label>
+          
+        </div>
+
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button type="button" class="btn addChoiceBtn">+ Add Choice</button>
+          <button type="button" class="btn btn-danger removeQuestionBtn">Remove Question</button>
+        </div>
+      </div>
+    </template>
+
+    <template id="choiceTemplate">
+      <div class="choice-row">
+        <input type="text" class="choice-text" placeholder="Choice text">
+        <label style="white-space:nowrap"><input type="checkbox" class="choice-correct"> Correct</label>
+        <button type="button" class="btn btn-danger removeChoiceBtn">Remove</button>
+      </div>
+    </template>
+
+    <script>
+      let qIndex = 0;
+
+      function addQuestionBlock() {
+        const tpl = document.getElementById('questionTemplate').innerHTML;
+        const html = tpl.replaceAll('{index}', qIndex).replaceAll('{number}', qIndex + 1);
+        const container = document.getElementById('questionsContainer');
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        container.appendChild(wrapper);
+
+        // add default choices
+        const choicesDiv = document.getElementById('choices_' + qIndex);
+        addChoiceRow(choicesDiv);
+        addChoiceRow(choicesDiv);
+
+        // wire buttons
+        wrapper.querySelector('.addChoiceBtn').addEventListener('click', () => addChoiceRow(choicesDiv));
+        wrapper.querySelector('.removeQuestionBtn').addEventListener('click', () => wrapper.remove());
+
+        qIndex++;
+      }
+
+      function addChoiceRow(choicesDiv) {
+        const ctpl = document.getElementById('choiceTemplate').content.cloneNode(true);
+        choicesDiv.appendChild(ctpl);
+        const last = choicesDiv.lastElementChild;
+        last.querySelector('.removeChoiceBtn').addEventListener('click', () => last.remove());
+      }
+
+      document.getElementById('addQuestionBtn').addEventListener('click', () => addQuestionBlock());
+     
+      addQuestionBlock();
+
+      document.getElementById('submitBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const questions = [];
+        const blocks = document.querySelectorAll('.qblock');
+        blocks.forEach(block => {
+          const idx = block.getAttribute('data-qindex');
+          const text = block.querySelector(`textarea[name="q_text_${idx}"]`).value.trim();
+          if (!text) return;
+          const q_type = block.querySelector(`select[name="q_type_${idx}"]`).value;
+          const difficulty = block.querySelector(`select[name="q_diff_${idx}"]`).value;
+          const marks = parseInt(block.querySelector(`input[name="q_marks_${idx}"]`).value) || 1;
+
+          const choices = [];
+          const choiceRows = block.querySelectorAll('#choices_' + idx + ' .choice-row');
+          choiceRows.forEach(cr => {
+            const ctext = cr.querySelector('.choice-text').value.trim();
+            const isCorrect = cr.querySelector('.choice-correct').checked;
+            if (ctext) choices.push({text: ctext, is_correct: isCorrect});
+          });
+
+          questions.push({text, question_type: q_type, difficulty, marks, choices});
+        });
+
+        if (questions.length === 0) {
+          alert('Add at least one question.');
+          return;
+        }
+
+        const payload = JSON.stringify({questions});
+        document.getElementById('payloadField').value = payload;
+        document.getElementById('bulkForm').submit();
+      });
+    </script>
+
+  </div>
+</body>
+</html>

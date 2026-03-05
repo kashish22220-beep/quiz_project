@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 35px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .header-content h1 {
+      color: #333;
+      font-size: 32px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .header-content p {
+      color: #888;
+      font-size: 15px;
+    }
+    
+    .logout-btn {
+      padding: 10px 20px;
+      background: #fff;
+      color: #667eea;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover {
+      background: #667eea;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+    
+    .btn {
+      padding: 15px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .add {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    
+    .edit {
+      background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+    }
+    
+    .users {
+      background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+    }
+    
+    .attempts {
+      background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+    }
+    
+    .section-title {
+      color: #333;
+      font-size: 22px;
+      margin-bottom: 20px;
+      padding-left: 10px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    th {
+      padding: 15px;
+      text-align: left;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #555;
+      font-size: 14px;
+    }
+    
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    tbody tr:hover {
+      background: #f8f9ff;
+      transform: scale(1.01);
+    }
+    
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .small-link {
+      font-size: 13px;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+    
+    .small-link:hover {
+      background: #667eea;
+      color: #fff;
+    }
+    
+    .action-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge.published {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .badge.unpublished {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-style: italic;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .actions {
+        grid-template-columns: 1fr;
+      }
+      
+      .table-wrapper {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-content">
+        <h1>⚡ Admin Dashboard</h1>
+        <p>Welcome back, <strong>{{ request.user.username }}</strong></p>
+      </div>
+      <a class="logout-btn" href="{% url 'logout' %}">Logout</a>
+    </div>
+
+    <div class="actions">
+      <a class="btn add" href="{% url 'admin:quiz_quiz_add' %}">
+        ➕ Add Quiz
+      </a>
+      <a class="btn edit" href="{% url 'admin:quiz_quiz_changelist' %}">
+        ✏️ Modify Quizzes
+      </a>
+      <a class="btn users" href="{% url 'admin:auth_user_changelist' %}">
+        👥 View Users
+      </a>
+      <a class="btn attempts" href="{% url 'admin:quiz_attempt_changelist' %}">
+        📊 View Attempts
+      </a>
+    </div>
+
+    <h3 class="section-title">Recent Quizzes</h3>
+    
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in quizzes %}
+            <tr>
+              <td><strong>{{ q.title }}</strong></td>
+              <td>
+                {% if q.published %}
+                  <span class="badge published">Published</span>
+                {% else %}
+                  <span class="badge unpublished">Unpublished</span>
+                {% endif %}
+              </td>
+              <td>{{ q.created_at|date:"M d, Y H:i" }}</td>
+              <td>
+                <div class="action-links">
+                  <a class="small-link" href="{% url 'admin:quiz_quiz_change' q.id %}">Edit</a>
+                  <a class="small-link" href="{% url 'quiz:quiz_detail' q.id %}">View</a>
+                  <a class="small-link" href="{% url 'admin:quiz_question_changelist' %}?quiz__id__exact={{ q.id }}">Questions</a>
+                  <a class="small-link" href="{% url 'quiz:add_questions_bulk' q.id %}">+ Bulk Add</a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="empty-state">
+                📝 No quizzes yet. Create your first quiz to get started!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

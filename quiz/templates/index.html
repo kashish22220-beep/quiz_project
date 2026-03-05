@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Quiz App — Home</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --accent1: #f0abfc;
+      --accent2: #c4b5fd;
+      --muted:#6b7280;
+      --card-bg:#fff;
+    }
+    body{
+      background: linear-gradient(135deg,var(--accent1),var(--accent2));
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    .card-hero{
+      width:100%;
+      max-width:640px;
+      background:var(--card-bg);
+      border-radius:16px;
+      padding:36px;
+      box-shadow:0 20px 60px rgba(8,31,66,0.18);
+      text-align:center;
+    }
+    .brand{font-weight:800;font-size:28px;color:#2b1b65}
+    .lead{color:var(--muted);margin-bottom:22px}
+    .form-control{background:#fff;border:1px solid #e6e6e9;height:54px;border-radius:10px;padding:12px}
+    .form-control:focus{box-shadow:0 0 0 0.15rem rgba(111,99,201,0.15);border-color:rgba(111,99,201,0.6)}
+    .btn-gradient{background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#fff; border-radius:10px; height:52px; font-weight:600}
+    .link-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .small-link{color:var(--accent1); text-decoration:underline}
+    .bottom-actions{display:flex;gap:12px;justify-content:center;margin-top:18px}
+    .btn-outline-custom{min-width:150px;border-radius:10px;padding:10px 18px}
+    .note{color:#9aa0a6;margin-top:16px}
+    @media (max-width:520px){
+      .card-hero{padding:20px}
+      .bottom-actions{flex-direction:column}
+      .link-row{flex-direction:column;gap:6px;align-items:stretch;text-align:center}
+    }
+  </style>
+</head>
+<body>
+  <main class="card-hero">
+
+    <div class="brand">Quiz App</div>
+    <div class="lead">Test your knowledge — login to continue</div>
+
+   
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {% for err in form.non_field_errors %}{{ err }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'quiz:home' %}" class="mt-3">
+      {% csrf_token %}
+
+      <div class="mb-3 text-start">
+        <label for="id_username" class="form-label">Username</label>
+        <input id="id_username" name="username" type="text" required class="form-control"
+               value="{{ request.POST.username|default:form.username.value }}">
+        {% if form.username.errors %}
+          <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3 text-start">
+        <label for="id_password" class="form-label">Password</label>
+        <input id="id_password" name="password" type="password" required class="form-control">
+        {% if form.password.errors %}
+          <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="text-start mb-3">
+        <a href="{% url 'password_reset' %}" class="small-link">Forgot password?</a>
+      </div>
+
+      <div class="d-grid mt-2">
+        <button type="submit" class="btn btn-gradient btn-lg">Login</button>
+      </div>
+
+     
+      <div class="bottom-actions">
+        <a href="{% url 'admin:index' %}" class="btn btn-outline-success btn-outline-custom" style="border-width:2px;color:#1e7a3e;background:#fff">Admin</a>
+        <a href="{% url 'quiz:register' %}" class="btn btn-outline-primary btn-outline-custom" style="border-width:2px;color:#5744b6;background:#fff">Sign Up</a>
+      </div>
+
+      
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
